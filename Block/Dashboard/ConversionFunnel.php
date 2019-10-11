@@ -21,11 +21,15 @@
 
 namespace Mageplaza\Reports\Block\Dashboard;
 
+use Exception;
 use Magento\Backend\Block\Template;
-use Mageplaza\Reports\Helper\Data;
-use Mageplaza\ReportsPro\Model\ResourceModel\Viewed\CollectionFactory as ViewedCollectionFactory;
+use Magento\Framework\Phrase;
+use Magento\Quote\Model\ResourceModel\Quote\Item\Collection;
 use Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory as ItemCollectionFactory;
 use Magento\Sales\Model\ResourceModel\Order\Item\CollectionFactory as OrderItemCollectionFactory;
+use Mageplaza\Reports\Helper\Data;
+use Mageplaza\Reports\Model\ResourceModel\Viewed\CollectionFactory as ViewedCollectionFactory;
+use Mageplaza\Reports\Model\ResourceModel\Viewed\Collection as ViewedCollection;
 
 /**
  * Class ConversionFunnel
@@ -70,18 +74,18 @@ class ConversionFunnel extends AbstractClass
         ItemCollectionFactory $itemCollectionFactory,
         OrderItemCollectionFactory $orderItemCollectionFactory,
         Data $helperData,
-        array $data = [])
-    {
+        array $data = []
+    ) {
         parent::__construct($context, $helperData, $data);
 
-        $this->viewedCollectionFactory    = $viewedCollectionFactory;
-        $this->itemCollectionFactory      = $itemCollectionFactory;
+        $this->viewedCollectionFactory = $viewedCollectionFactory;
+        $this->itemCollectionFactory = $itemCollectionFactory;
         $this->orderItemCollectionFactory = $orderItemCollectionFactory;
     }
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getProductViews()
     {
@@ -103,7 +107,7 @@ class ConversionFunnel extends AbstractClass
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAllCartItems()
     {
@@ -115,7 +119,7 @@ class ConversionFunnel extends AbstractClass
 
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getAllOrderItem()
     {
@@ -126,10 +130,10 @@ class ConversionFunnel extends AbstractClass
     }
 
     /**
-     * @param \Magento\Sales\Model\ResourceModel\Order\Item\Collection|\Mageplaza\ReportsPro\Model\ResourceModel\Viewed\Collection|\Magento\Quote\Model\ResourceModel\Quote\Item\Collection| $collection
+     * @param \Magento\Sales\Model\ResourceModel\Order\Item\Collection|ViewedCollection|Collection| $collection
      *
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     protected function addFilter($collection)
     {
@@ -153,7 +157,7 @@ class ConversionFunnel extends AbstractClass
      * @param null $to
      *
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     protected function getDateRange($from = null, $to = null)
     {
@@ -169,8 +173,8 @@ class ConversionFunnel extends AbstractClass
         }
         if ($to == null || $from == null) {
             $dates = $this->_helperData->getDateRange();
-            $from  = $dates[0];
-            $to    = $dates[1];
+            $from = $dates[0];
+            $to = $dates[1];
         }
 
         return [$from, $to];
@@ -181,18 +185,18 @@ class ConversionFunnel extends AbstractClass
      */
     protected function getStore()
     {
-            $storeParam       = $this->_request->getParam('store');
-            $storeFilterParam = isset($this->_request->getParam('mpFilter')['store'])
-                ? $this->_request->getParam('mpFilter')['store'] : null;
-            $storeId     = ($storeFilterParam !== null && $storeFilterParam !== "")
-                ? $storeFilterParam
-                : (($storeParam !== null && $storeParam !== "") ? $storeParam : 0);
+        $storeParam = $this->_request->getParam('store');
+        $storeFilterParam = isset($this->_request->getParam('mpFilter')['store'])
+            ? $this->_request->getParam('mpFilter')['store'] : null;
+        $storeId = ($storeFilterParam !== null && $storeFilterParam !== "")
+            ? $storeFilterParam
+            : (($storeParam !== null && $storeParam !== "") ? $storeParam : 0);
 
         return $storeId;
     }
 
     /**
-     * @return \Magento\Framework\Phrase|string
+     * @return Phrase|string
      */
     public function getTitle()
     {
