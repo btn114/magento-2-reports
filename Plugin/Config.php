@@ -21,14 +21,14 @@
 
 namespace Mageplaza\Reports\Plugin;
 
-use Magento\Backend\Model\Menu\Builder\AbstractCommand;
+use Magento\Framework\App\Route\Config as BackendConfig;
 use Mageplaza\Reports\Helper\Data;
 
 /**
- * Class MoveMenu
+ * Class Config
  * @package Mageplaza\Reports\Plugin
  */
-class MoveMenu
+class Config
 {
     /**
      * @var Data
@@ -46,18 +46,16 @@ class MoveMenu
     }
 
     /**
-     * @param AbstractCommand $subject
-     * @param $itemParams
-     *
+     * @param BackendConfig $subject
+     * @param $result
      * @return mixed
-     * @SuppressWarnings(Unused)
      */
-    public function afterExecute(AbstractCommand $subject, $itemParams)
+    public function afterGetRouteByFrontName(BackendConfig $subject, $result)
     {
-        if ($itemParams['id'] === 'Mageplaza_Reports::dashboard' && !$this->helper->isEnabledDashboard()) {
-            $itemParams['removed'] = true;
+        if (!$result && $this->helper->versionCompare('2.2.8', '=')) {
+            return 'adminhtml';
         }
 
-        return $itemParams;
+        return $result;
     }
 }

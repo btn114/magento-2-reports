@@ -22,11 +22,11 @@
 namespace Mageplaza\Reports\Model\ResourceModel\Viewed;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use Magento\Reports\Model\Product\Index\Viewed;
+use Magento\Reports\Model\ResourceModel\Product\Index\Viewed;
 
 /**
  * Class Collection
- * @package Mageplaza\ReportsPro\Model\ResourceModel\Viewed
+ * @package Mageplaza\Reports\Model\ResourceModel\Viewed
  */
 class Collection extends AbstractCollection
 {
@@ -37,6 +37,6 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init(Viewed::class, \Magento\Reports\Model\ResourceModel\Product\Index\Viewed::class);
+        $this->_init(\Magento\Reports\Model\Product\Index\Viewed::class, Viewed::class);
     }
 }

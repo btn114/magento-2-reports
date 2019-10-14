@@ -21,7 +21,9 @@
 
 namespace Mageplaza\Reports\Block;
 
+use Exception;
 use Magento\Backend\Block\Template;
+use Magento\Framework\Exception\LocalizedException;
 use Mageplaza\Reports\Helper\Data;
 use Mageplaza\Reports\Model\CardsManageFactory;
 
@@ -48,6 +50,7 @@ class Dashboard extends Template
 
     /**
      * Dashboard constructor.
+     *
      * @param Template\Context $context
      * @param CardsManageFactory $cardsManageFactory
      * @param Data $helperData
@@ -58,17 +61,16 @@ class Dashboard extends Template
         CardsManageFactory $cardsManageFactory,
         Data $helperData,
         array $data = []
-    )
-    {
-        parent::__construct($context, $data);
-
+    ) {
         $this->_cardsManageFactory = $cardsManageFactory;
         $this->_helperData         = $helperData;
+
+        parent::__construct($context, $data);
     }
 
     /**
      * @return Template|void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function _prepareLayout()
     {
@@ -114,11 +116,17 @@ class Dashboard extends Template
 
     /**
      * @return array
-     * @throws \Exception
      */
     public function getCards()
     {
-        return $this->_cardsManageFactory->create();
+        try {
+            $result = $this->_cardsManageFactory->create();
+        } catch (Exception $e) {
+            $result = [];
+            $this->_logger->critical($e);
+        }
+
+        return $result;
     }
 
     /**
@@ -131,11 +139,11 @@ class Dashboard extends Template
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDate()
     {
-        return json_encode($this->_helperData->getDateRange());
+        return Data::jsonEncode($this->_helperData->getDateRange());
     }
 
     /**
@@ -144,5 +152,19 @@ class Dashboard extends Template
     public function getArea()
     {
         return 'adminhtml';
+    }
+
+    /**
+     * @return array
+     * @return array
+     */
+    public function getGridStackConfig()
+    {
+        $config = [
+            'url'         => $this->getUrl('mpreports/cards/saveposition', ['form_key' => $this->getFormKey()]),
+            'loadCardUrl' => $this->getUrl('mpreports/cards/loadcard', ['form_key' => $this->getFormKey()])
+        ];
+
+        return $config;
     }
 }

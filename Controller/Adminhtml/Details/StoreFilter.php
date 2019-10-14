@@ -22,7 +22,9 @@
 namespace Mageplaza\Reports\Controller\Adminhtml\Details;
 
 use Magento\Backend\App\Action;
+use Magento\Backend\Block\Store\Switcher;
 use Magento\Framework\Json\Helper\Data;
+use Magento\Framework\View\Result\Page;
 use Magento\Framework\View\Result\PageFactory;
 
 /**
@@ -43,6 +45,7 @@ class StoreFilter extends Action
 
     /**
      * StoreFilter constructor.
+     *
      * @param Action\Context $context
      * @param PageFactory $resultPageFactory
      * @param Data $jsonHelper
@@ -51,23 +54,22 @@ class StoreFilter extends Action
         Action\Context $context,
         PageFactory $resultPageFactory,
         Data $jsonHelper
-    )
-    {
+    ) {
         $this->resultPageFactory = $resultPageFactory;
-        $this->_jsonHelper       = $jsonHelper;
+        $this->_jsonHelper = $jsonHelper;
 
         parent::__construct($context);
     }
 
     /**
-     * @return \Magento\Framework\View\Result\Page
+     * @return Page
      */
     public function execute()
     {
         $resultPage = $this->resultPageFactory->create();
         if ($this->getRequest()->isAjax()) {
             $storeHtml = $resultPage->getLayout()
-                ->createBlock('Magento\Backend\Block\Store\Switcher')
+                ->createBlock(Switcher::class)
                 ->setSwitchWebsites(0)
                 ->setSwitchStoreGroups(0)
                 ->setSwitchStoreViews(1)
@@ -78,7 +80,8 @@ class StoreFilter extends Action
             return $this->getResponse()->representJson(
                 $this->_jsonHelper->jsonEncode(
                     ['store' => $storeHtml]
-                ));
+                )
+            );
         }
 
         return $resultPage;

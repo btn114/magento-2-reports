@@ -27,6 +27,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\Auth\Session;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
+use Mageplaza\Reports\Block\Dashboard\Card;
 use Mageplaza\Reports\Helper\Data;
 use Mageplaza\Reports\Model\CardsManageFactory;
 
@@ -34,7 +35,7 @@ use Mageplaza\Reports\Model\CardsManageFactory;
  * Class SavePosition
  * @package Mageplaza\Reports\Controller\Adminhtml\Cards
  */
-class SavePosition extends Action
+class LoadCard extends Action
 {
     /**
      * @var Session
@@ -58,43 +59,37 @@ class SavePosition extends Action
         Session $authSession,
         CardsManageFactory $cardsManageFactory
     ) {
-        $this->_authSession = $authSession;
+        $this->_authSession        = $authSession;
         $this->_cardsManageFactory = $cardsManageFactory;
 
         parent::__construct($context);
     }
 
     /**
-     * @return ResponseInterface|ResultInterface|void
+     * @return ResponseInterface|ResultInterface
      * @throws Exception
      */
     public function execute()
     {
-        $items = $this->getRequest()->getParam('items');
-        if ($items && $this->getRequest()->isAjax()) {
-            $userId = $this->_authSession->getUser()->getId();
-            $config = $this->_cardsManageFactory->getCurrentConfig();
-            $data = $config->getId()
-                ? $config->getConfig()
-                : $this->_cardsManageFactory->getDefaultConfig()->getConfig();
-            foreach ($items as $id => $item) {
-                $data[$id]['x'] = $item['x'];
-                $data[$id]['y'] = $item['y'];
-                $data[$id]['width'] = $item['width'];
-                $data[$id]['height'] = $item['height'];
-                $data[$id]['visible'] = isset($item['visible']) ? $item['visible'] : 1;
-            }
-            $data = Data::jsonEncode($data);
-            if ($config->getId()) {
-                $config->setConfig($data)->save();
-            } else {
-                $config->setData([
-                    'namespace'  => 'mageplaza_reports_cards',
-                    'user_id'    => $userId,
-                    'identifier' => 'current',
-                    'config'     => $data
-                ])->save();
+        $id     = $this->getRequest()->getParam('id');
+        $layout = $this->_view->getLayout();
+        $data   = [];
+
+        $cardsManager = $this->_cardsManageFactory->create();
+        if ($id && isset($cardsManager[$id]) && $this->getRequest()->isAjax()) {
+            try {
+                /** @var Card $block */
+                $block = $layout->createBlock(Card::class);
+                $block->setCard($cardsManager[$id]);
+                $data['html'] = $block->toHtml();
+            } catch (Exception $exception) {
+                $data['message'] = $exception->getMessage();
             }
         }
+        if (empty($data)) {
+            $data['message'] = __('Can not be load Card');
+        }
+
+        return $this->getResponse()->representJson(Data::jsonEncode($data));
     }
 }

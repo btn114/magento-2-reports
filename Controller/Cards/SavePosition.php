@@ -21,9 +21,13 @@
 
 namespace Mageplaza\Reports\Controller\Cards;
 
+use Exception;
+use Magento\Backend\Model\Auth\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Backend\Model\Auth\Session;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Mageplaza\Reports\Helper\Data;
 use Mageplaza\Reports\Model\CardsManageFactory;
 
 /**
@@ -44,6 +48,7 @@ class SavePosition extends Action
 
     /**
      * SavePosition constructor.
+     *
      * @param Context $context
      * @param Session $authSession
      * @param CardsManageFactory $cardsManageFactory
@@ -52,33 +57,33 @@ class SavePosition extends Action
         Context $context,
         Session $authSession,
         CardsManageFactory $cardsManageFactory
-    )
-    {
-        parent::__construct($context);
-
-        $this->_authSession        = $authSession;
+    ) {
+        $this->_authSession = $authSession;
         $this->_cardsManageFactory = $cardsManageFactory;
+
+        parent::__construct($context);
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|void
-     * @throws \Exception
+     * @return ResponseInterface|ResultInterface|void
+     * @throws Exception
      */
     public function execute()
     {
-        if ($this->getRequest()->isAjax() && $items = $this->getRequest()->getParam('items')) {
+        $items = $this->getRequest()->getParam('items');
+        if ($items && $this->getRequest()->isAjax()) {
             $config = $this->_cardsManageFactory->getCurrentConfig();
-            $data   = $config->getId()
+            $data = $config->getId()
                 ? $config->getConfig()
                 : $this->_cardsManageFactory->getDefaultConfig()->getConfig();
             foreach ($items as $id => $item) {
-                $data[$id]['x']       = $item['x'];
-                $data[$id]['y']       = $item['y'];
-                $data[$id]['width']   = $item['width'];
-                $data[$id]['height']  = $item['height'];
+                $data[$id]['x'] = $item['x'];
+                $data[$id]['y'] = $item['y'];
+                $data[$id]['width'] = $item['width'];
+                $data[$id]['height'] = $item['height'];
                 $data[$id]['visible'] = isset($item['visible']) ? $item['visible'] : 1;
             }
-            $data = \Mageplaza\Reports\Helper\Data::jsonEncode($data);
+            $data = Data::jsonEncode($data);
             if ($config->getId()) {
                 $config->setConfig($data)->save();
             } else {

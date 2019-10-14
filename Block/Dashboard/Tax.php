@@ -21,6 +21,11 @@
 
 namespace Mageplaza\Reports\Block\Dashboard;
 
+use Exception;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Phrase;
+
 /**
  * Class Tax
  * @package Mageplaza\Reports\Block\Dashboard
@@ -36,12 +41,12 @@ class Tax extends AbstractClass
 
     /**
      * @return float|int|string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function getTotal()
     {
-        $date   = $this->_helperData->getDateRange();
+        $date = $this->_helperData->getDateRange();
         $totals = $this->_helperData->getTotalsByDateRange($date[0], $date[1]);
 
         return $this->getBaseCurrency()->format($totals->getTax() ? $totals->getTax() : 0);
@@ -49,40 +54,44 @@ class Tax extends AbstractClass
 
     /**
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function getRate()
     {
-        $dates         = $this->_helperData->getDateRange();
-        $totals        = $this->_helperData->getTotalsByDateRange($dates[0], $dates[1]);
+        $dates = $this->_helperData->getDateRange();
+        $totals = $this->_helperData->getTotalsByDateRange($dates[0], $dates[1]);
         $compareTotals = $this->_helperData->getTotalsByDateRange($dates[2], $dates[3]);
-        if ($totals->getTax() == 0 && $compareTotals->getTax() == 0) {
+        if ((int) $totals->getTax() === 0 && (int) $compareTotals->getTax() === 0) {
             return 0;
-        } else if ($compareTotals->getTax() == 0) {
+        }
+        if ((int) $compareTotals->getTax() === 0) {
             return 100;
-        } else if ($totals->getTax() == 0) {
+        }
+        if ((int) $totals->getTax() === 0) {
             return -100;
         }
 
-        return round(((($totals->getTax() - $compareTotals->getTax()) / $compareTotals->getTax()) * 100), 2);
+        return round((($totals->getTax() - $compareTotals->getTax()) / $compareTotals->getTax()) * 100, 2);
     }
 
     /**
      * @param $date
      * @param null $endDate
+     *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function getDataByDate($date, $endDate = null)
     {
         $totals = $this->_helperData->getTotalsByDateRange($date, $endDate);
 
-        return round($totals->getTax() ? $totals->getTax() : 0, 2);
+        return round($totals->getTax() ?: 0, 2);
     }
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     protected function getYUnit()
     {
@@ -90,7 +99,7 @@ class Tax extends AbstractClass
     }
 
     /**
-     * @return \Magento\Framework\Phrase|string
+     * @return Phrase|string
      */
     public function getTitle()
     {

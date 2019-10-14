@@ -21,6 +21,11 @@
 
 namespace Mageplaza\Reports\Block\Dashboard;
 
+use Exception;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Phrase;
+
 /**
  * Class AverageOrderValue
  * @package Mageplaza\Reports\Block\Dashboard
@@ -35,7 +40,7 @@ class AverageOrderValue extends AbstractClass
     protected $_template = 'dashboard/chart.phtml';
 
     /**
-     * @return \Magento\Framework\Phrase|string
+     * @return Phrase|string
      */
     public function getTitle()
     {
@@ -44,53 +49,57 @@ class AverageOrderValue extends AbstractClass
 
     /**
      * @return float|int|string
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function getTotal()
     {
-        $date   = $this->_helperData->getDateRange();
+        $date = $this->_helperData->getDateRange();
         $totals = $this->_helperData->getSalesByDateRange($date[0], $date[1]);
 
-        return $this->getBaseCurrency()->format($totals->getAverage() ? $totals->getAverage() : 0);
+        return $this->getBaseCurrency()->format($totals->getAverage() ?: 0);
     }
 
     /**
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function getRate()
     {
-        $dates         = $this->_helperData->getDateRange();
-        $totals        = $this->_helperData->getSalesByDateRange($dates[0], $dates[1]);
+        $dates = $this->_helperData->getDateRange();
+        $totals = $this->_helperData->getSalesByDateRange($dates[0], $dates[1]);
         $compareTotals = $this->_helperData->getSalesByDateRange($dates[2], $dates[3]);
-        if ($totals->getAverage() == 0 && $compareTotals->getAverage() == 0) {
+        if ((int) $totals->getAverage() === 0 && (int) $compareTotals->getAverage() === 0) {
             return 0;
-        } else if ($compareTotals->getAverage() == 0) {
+        }
+        if ((int) $compareTotals->getAverage() === 0) {
             return 100;
-        } else if ($totals->getAverage() == 0) {
+        }
+        if ((int) $totals->getAverage() === 0) {
             return -100;
         }
 
-        return round(((($totals->getAverage() - $compareTotals->getAverage()) / $compareTotals->getAverage()) * 100), 2);
+        return round((($totals->getAverage() - $compareTotals->getAverage()) / $compareTotals->getAverage()) * 100, 2);
     }
 
     /**
      * @param $date
      * @param null $endDate
+     *
      * @return float|int
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     protected function getDataByDate($date, $endDate = null)
     {
         $totals = $this->_helperData->getSalesByDateRange($date, $endDate);
 
-        return round($totals->getAverage() ? $totals->getAverage() : 0, 2);
+        return round($totals->getAverage() ?: 0, 2);
     }
 
     /**
      * @return string
+     * @throws NoSuchEntityException
      */
     protected function getYUnit()
     {

@@ -44,14 +44,13 @@ class BackendLogoUrl
     /**
      * BackendLogoUrl constructor.
      *
-     * @param Data         $helperData
+     * @param Data $helperData
      * @param UrlInterface $backendUrl
      */
     public function __construct(
         Data $helperData,
         UrlInterface $backendUrl
-    )
-    {
+    ) {
         $this->_helperData = $helperData;
         $this->_backendUrl = $backendUrl;
     }
@@ -65,7 +64,7 @@ class BackendLogoUrl
      */
     public function afterGetHomePageUrl(BackendHelper $data, $result)
     {
-        if ($this->_helperData->isEnabled()) {
+        if ($this->_helperData->isEnabledDashboard()) {
             $result = $this->_backendUrl->getRouteUrl('mpreports/dashboard');
         }
 

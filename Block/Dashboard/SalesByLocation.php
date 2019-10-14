@@ -21,9 +21,13 @@
 
 namespace Mageplaza\Reports\Block\Dashboard;
 
+use Exception;
 use Magento\Backend\Block\Template;
 use Magento\Directory\Model\CountryFactory;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Phrase;
 use Magento\Sales\Model\OrderFactory;
+use Magento\Sales\Model\ResourceModel\Order\Collection;
 use Mageplaza\Reports\Helper\Data;
 
 /**
@@ -51,6 +55,7 @@ class SalesByLocation extends AbstractClass
 
     /**
      * SalesByLocation constructor.
+     *
      * @param OrderFactory $orderFactory
      * @param CountryFactory $countryFactory
      * @param Template\Context $context
@@ -62,12 +67,12 @@ class SalesByLocation extends AbstractClass
         OrderFactory $orderFactory,
         CountryFactory $countryFactory,
         Data $helperData,
-        array $data = [])
-    {
-        parent::__construct($context, $helperData, $data);
-
+        array $data = []
+    ) {
         $this->_countryFactory = $countryFactory;
-        $this->_orderFactory   = $orderFactory;
+        $this->_orderFactory = $orderFactory;
+
+        parent::__construct($context, $helperData, $data);
     }
 
     /**
@@ -76,11 +81,13 @@ class SalesByLocation extends AbstractClass
      * @param null $size
      *
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException*@throws \Exception
+     * @throws LocalizedException*@throws \Exception
+     * @throws Exception
      */
     protected function getDataByDateRange($startDate, $endDate, $size = null)
     {
-        $data       = [];
+        $data = [];
+        /** @var Collection $collection */
         $collection = $this->_orderFactory->create()->getCollection();
         $collection = $this->_helperData->addStoreFilter($collection);
         $collection = $this->_helperData->addStatusFilter($collection);
@@ -88,7 +95,8 @@ class SalesByLocation extends AbstractClass
         $collection->getSelect()->join(
             ['soa' => $collection->getTable('sales_order_address')],
             "main_table.entity_id=soa.parent_id AND soa.address_type='billing'",
-            ['country_count' => 'COUNT(country_id)', 'country_id'])
+            ['country_count' => 'COUNT(country_id)', 'country_id']
+        )
             ->group('country_id')->order('country_count DESC');
         if ($size) {
             $collection->setPageSize($size);
@@ -103,14 +111,14 @@ class SalesByLocation extends AbstractClass
 
     /**
      * @return array
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws Exception
      */
     public function getCollection()
     {
-        $collection  = [];
-        $date        = $this->_helperData->getDateRange();
-        $data        = $this->getDataByDateRange($date[0], $date[1], 5);
+        $collection = [];
+        $date = $this->_helperData->getDateRange();
+        $data = $this->getDataByDateRange($date[0], $date[1], 5);
         $compareData = $this->getDataByDateRange($date[2], $date[3]);
         foreach ($data as $key => $item) {
             if (isset($compareData[$key]) && $compareData[$key] > 0) {
@@ -130,6 +138,7 @@ class SalesByLocation extends AbstractClass
 
     /**
      * @param $countryId
+     *
      * @return string
      */
     private function getCountryNameById($countryId)
@@ -140,23 +149,11 @@ class SalesByLocation extends AbstractClass
     }
 
     /**
-     * @return \Magento\Framework\Phrase|string
+     * @return Phrase|string
      */
     public function getTitle()
     {
-        return __('Sale By Location');
-    }
-
-    /**
-     * @return string
-     */
-    public function getDetailUrl()
-    {
-        if (!$this->_helperData->isProPackage()) {
-            return parent::getDetailUrl();
-        }
-
-        return $this->getUrl('mpreports/details/salesbylocation');
+        return __('Sales By Location');
     }
 
     /**

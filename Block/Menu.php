@@ -21,10 +21,11 @@
 
 namespace Mageplaza\Reports\Block;
 
+use Exception;
 use Magento\Backend\Block\Template;
 use Magento\Customer\Model\Customer\Source\Group;
-use Mageplaza\Reports\Helper\Data;
 use Magento\Sales\Model\Config\Source\Order\Status;
+use Mageplaza\Reports\Helper\Data;
 
 /**
  * Class Menu
@@ -59,6 +60,7 @@ class Menu extends Template
 
     /**
      * Menu constructor.
+     *
      * @param Template\Context $context
      * @param Group $customerGroup
      * @param Status $orderStatus
@@ -74,15 +76,15 @@ class Menu extends Template
         Data $helperData,
         array $girdName = [],
         array $menuUrls = [],
-        array $data = [])
-    {
-        parent::__construct($context, $data);
-
+        array $data = []
+    ) {
         $this->customerGroup = $customerGroup;
         $this->orderStatus = $orderStatus;
-        $this->helperData    = $helperData;
-        $this->girdName      = $girdName;
-        $this->menuUrls      = $menuUrls;
+        $this->helperData = $helperData;
+        $this->girdName = $girdName;
+        $this->menuUrls = $menuUrls;
+
+        parent::__construct($context, $data);
     }
 
     /**
@@ -95,7 +97,7 @@ class Menu extends Template
 
     /**
      * @return array
-     * @throws \Exception
+     * @throws Exception
      */
     public function getDateRange()
     {
@@ -143,6 +145,7 @@ class Menu extends Template
     {
         $statuses = $this->orderStatus->toOptionArray();
         array_shift($statuses);
+
         return $statuses;
     }
 }
