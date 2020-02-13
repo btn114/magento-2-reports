@@ -26,8 +26,8 @@ define([
 ], function ($, moment, uiRegistry) {
     'use strict';
     var dateRangeEl = $('#daterange');
-
     var storeSwitcherEl = $('.mp-rp-store-switcher');
+
     $.widget('mageplaza.menu', {
         _create: function () {
             this.initNowDateRange(moment(this.options.date[0]), moment(this.options.date[1]));
@@ -39,8 +39,8 @@ define([
             this.initDateUsedSelect();
         },
         initDateRange: function (el, start, end, data) {
-            function cb(start, end) {
-                el.find('span').html(start.format('MMM DD, YYYY') + ' - ' + end.format('MMM DD, YYYY'));
+            function cb(cbStart, cbEnd) {
+                el.find('span').html(cbStart.format('MMM DD, YYYY') + ' - ' + cbEnd.format('MMM DD, YYYY'));
             }
 
             el.daterangepicker(data, cb);
@@ -56,21 +56,27 @@ define([
                     'Last 7 Days': [moment().subtract(6, 'days'), moment()],
                     'Last 30 Days': [moment().subtract(29, 'days'), moment()],
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
-                    'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                    'Last Month': [
+                        moment().subtract(1, 'month').startOf('month'),
+                        moment().subtract(1, 'month').endOf('month')
+                    ],
                     'YTD': [moment().subtract(1, 'year'), moment()],
                     '2YTD': [moment().subtract(2, 'year'), moment()]
                 }
             };
+
             this.initDateRange(dateRangeEl, start, end, dateRangeData);
         },
         initDateRangeApply: function () {
-
             var self = this;
+
             dateRangeEl.on('apply.daterangepicker', function (ev, picker, moment) {
+                var grid, params;
+
                 self.initNowDateRange(picker.startDate, picker.endDate);
                 self.initDateRangeApply();
-                var grid = uiRegistry.get(self.options.gridName);
-                var params = grid.get('params');
+                grid = uiRegistry.get(self.options.gridName);
+                params = grid.get('params');
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }
@@ -84,16 +90,19 @@ define([
         },
         initStoreSwitcher: function () {
             var self = this;
+
             $('[data-role="stores-list"] a').on("click", function (e) {
                 var grid = uiRegistry.get(self.options.gridName);
                 var params = grid.get('params');
+                var data;
+
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }
                 params.mpFilter.store = $(this).attr('data-value');
                 grid.reload();
 
-                var data = {
+                data = {
                     store: $(this).attr('data-value')
                 };
                 $.ajax({
@@ -112,9 +121,11 @@ define([
         },
         initCustomerGroupSelect: function () {
             var self = this;
+
             $('.customer-group select').change(function () {
                 var grid = uiRegistry.get(self.options.gridName);
                 var params = grid.get('params');
+
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }
@@ -124,9 +135,11 @@ define([
         },
         initPeriodSelect: function () {
             var self = this;
+
             $('.period select').change(function () {
                 var grid = uiRegistry.get(self.options.gridName);
                 var params = grid.get('params');
+
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }
@@ -136,9 +149,11 @@ define([
         },
         initDateUsedSelect: function () {
             var self = this;
+
             $('.date_used select').change(function () {
                 var grid = uiRegistry.get(self.options.gridName);
                 var params = grid.get('params');
+
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }
@@ -149,6 +164,7 @@ define([
         initOrderStatusSelect: function () {
             var self = this;
             var cardsTableEl = $('.mp-rp-order-status.admin__action-dropdown-wrap.admin__data-grid-action-columns');
+
             $('button#mp-rp-order-status').on('click',function () {
                 if (cardsTableEl.hasClass('_active')) {
                     cardsTableEl.removeClass('_active');
@@ -159,6 +175,7 @@ define([
             $('.order_status input').on('click',function () {
                 var grid = uiRegistry.get(self.options.gridName);
                 var params = grid.get('params');
+
                 if (typeof params.mpFilter === 'undefined') {
                     params.mpFilter = {};
                 }

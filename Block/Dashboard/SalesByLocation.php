@@ -26,8 +26,8 @@ use Magento\Backend\Block\Template;
 use Magento\Directory\Model\CountryFactory;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Phrase;
-use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order\Collection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Mageplaza\Reports\Helper\Data;
 
 /**
@@ -44,9 +44,9 @@ class SalesByLocation extends AbstractClass
     protected $_template = 'dashboard/sales_by_location.phtml';
 
     /**
-     * @var OrderFactory
+     * @var CollectionFactory
      */
-    protected $_orderFactory;
+    protected $_orderCollectionFactory;
 
     /**
      * @var CountryFactory
@@ -56,21 +56,21 @@ class SalesByLocation extends AbstractClass
     /**
      * SalesByLocation constructor.
      *
-     * @param OrderFactory $orderFactory
-     * @param CountryFactory $countryFactory
      * @param Template\Context $context
+     * @param CollectionFactory $orderCollectionFactory
+     * @param CountryFactory $countryFactory
      * @param Data $helperData
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
-        OrderFactory $orderFactory,
+        CollectionFactory $orderCollectionFactory,
         CountryFactory $countryFactory,
         Data $helperData,
         array $data = []
     ) {
         $this->_countryFactory = $countryFactory;
-        $this->_orderFactory = $orderFactory;
+        $this->_orderCollectionFactory = $orderCollectionFactory;
 
         parent::__construct($context, $helperData, $data);
     }
@@ -88,7 +88,7 @@ class SalesByLocation extends AbstractClass
     {
         $data = [];
         /** @var Collection $collection */
-        $collection = $this->_orderFactory->create()->getCollection();
+        $collection = $this->_orderCollectionFactory->create();
         $collection = $this->_helperData->addStoreFilter($collection);
         $collection = $this->_helperData->addStatusFilter($collection);
         $collection = $this->_helperData->addTimeFilter($collection, $startDate, $endDate);

@@ -38,7 +38,7 @@ define([
                 options: this.getOptions()
             };
 
-            new Chart(ctx, data);
+            new window.Chart(ctx, data);
         },
         getOptions: function () {
             var self = this;
