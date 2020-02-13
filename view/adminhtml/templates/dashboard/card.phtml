@@ -80,7 +80,7 @@ $card = $block->getCard();
         'jquery'
     ],function ($) {
         $.ajax({
-            url: '<?= /** @noEscape */ $block->getUrl('mpreports/cards/loadcard') ?>',
+            url: '<?= /** @noEscape */ $block->getUrl('mpreports/cards/loadcard', ['_current' => true]) ?>',
             data: <?= \Mageplaza\Reports\Helper\Data::jsonEncode($card->getData()) ?>,
             success: function (res) {
                 $('#<?= /** @noEscape */ $card->getId() ?> .dashboard-item-container').html($(res.html).find('.dashboard-item-container').html());
