@@ -58,7 +58,7 @@ abstract class AbstractClass extends Template
     /**
      * @var Currency|null
      */
-    protected $_currentCurrencyCode = null;
+    protected $_currentCurrencyCode;
 
     /**
      * @var
@@ -234,6 +234,7 @@ abstract class AbstractClass extends Template
      * @param $endDate
      *
      * @return array
+     * @throws Exception
      */
     protected function getDataByDateRange($startDate, $endDate)
     {

@@ -70,7 +70,7 @@ define([
         initDateRangeApply: function () {
             var self = this;
 
-            dateRangeEl.on('apply.daterangepicker', function (ev, picker, moment) {
+            dateRangeEl.on('apply.daterangepicker', function (ev, picker) {
                 var grid, params;
 
                 self.initNowDateRange(picker.startDate, picker.endDate);

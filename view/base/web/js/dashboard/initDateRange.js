@@ -130,7 +130,7 @@ define([
         initNowDateRangeObserver: function () {
             var self = this;
 
-            dateRangeEl.on('apply.daterangepicker', function (ev, picker, moment) {
+            dateRangeEl.on('apply.daterangepicker', function (ev, picker) {
                 var data;
 
                 dateRangeEl.data().startDate = picker.startDate;

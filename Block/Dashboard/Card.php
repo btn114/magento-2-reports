@@ -21,7 +21,6 @@
 
 namespace Mageplaza\Reports\Block\Dashboard;
 
-use Exception;
 use Magento\Backend\Block\Template;
 use Mageplaza\Reports\Helper\Data;
 

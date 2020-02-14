@@ -57,7 +57,7 @@ $card = $block->getCard();
                             $rate = $card->getRate();
                             if (($rate !== '') && $block->isCompare()) : ?>
                                 <div class="chart-rate <?= $rate > 0 ? 'up-rate mp-green' : ($rate < 0 ? 'down-rate mp-red' : '') ?>">
-                                    <?= abs($rate) . '%' ?>
+                                    <?= /** @noEscape */ abs($rate) . '%' ?>
                                 </div>
                             <?php endif; ?>
                         </div>
