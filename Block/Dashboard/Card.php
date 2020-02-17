@@ -90,4 +90,12 @@ class Card extends Template
     {
         return $this->setData('mp_card', $card);
     }
+
+    /**
+     * @return string
+     */
+    public function getArea()
+    {
+        return 'adminhtml';
+    }
 }
